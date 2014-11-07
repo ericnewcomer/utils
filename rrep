@@ -1,0 +1,32 @@
+#!/bin/bash
+
+###################################################################
+# Shell wrapper using the delightful ack in combination with sed
+# to do recursive string replacement inside files.
+# Inspired from: https://coderwall.com/p/7ol_ja
+###################################################################
+
+old=$1
+new=$2
+
+if [ $# -ne 2 ]
+then
+  echo "Usage: rrep old-pattern new-pattern"
+  exit 100
+fi
+
+echo
+ack "$old"
+
+files=`ack "$old" -l | wc -l | tr -d ' '`
+
+echo
+echo "Found $files files that contain \"$old\"."
+read -p "Are you sure you want to replace all of them with \"$new\" ? [no] " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    echo "Replacing $old with $new"
+    `ack "$old" -l --print0 | xargs -0 sed -i "" "s/$old/$new/g"`
+fi
+exit 0
